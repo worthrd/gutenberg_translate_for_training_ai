@@ -1,0 +1,39 @@
+services:
+  redis:
+    image: redis:7
+    ports:
+      - "6379:6379"
+
+  worker:
+    build: .
+    command: python -m celery -A app.celery_app worker --loglevel=info --concurrency=1 -E
+    env_file: .env
+    volumes:
+      - ./output:/app/output
+      - ./input:/app/input
+    depends_on:
+      - redis
+
+  producer:
+    build: .
+    command: python -m app.producer
+    env_file: .env
+    volumes:
+      - ./input:/app/input
+    depends_on:
+      - redis
+
+
+  flower:
+    build: .
+    command: celery -A app.celery_app flower
+    env_file: .env
+    working_dir: /app
+    ports:
+      - "5555:5555"
+    environment:
+      CELERY_BROKER_URL: redis://redis:6379/0
+      CELERY_RESULT_BACKEND: redis://redis:6379/0
+    depends_on:
+      - producer
+      - redis
