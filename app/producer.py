@@ -9,7 +9,7 @@ print("INPUT FILES:", list(INPUT_DIR.glob("*.txt")))
 chunk_id = 0
 
 for txt_file in INPUT_DIR.glob("*.txt"):
-    print(f"📘 Kuyruğa alınıyor: {txt_file.name}")
+    print(f"Adding queue: {txt_file.name}")
 
     text = txt_file.read_text(encoding="utf-8", errors="ignore")
     clean_text = clean_gutenberg_text(text)
@@ -19,4 +19,4 @@ for txt_file in INPUT_DIR.glob("*.txt"):
         process_chunk.delay(chunk, chunk_id)
         chunk_id += 1
 
-print("✅ Tüm chunk'lar kuyruğa alındı")
+print("All chunks has been added to the queue")
